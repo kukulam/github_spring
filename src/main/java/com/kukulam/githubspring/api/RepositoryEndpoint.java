@@ -10,16 +10,16 @@ import java.util.Optional;
 @RequestMapping("/repositories")
 public class RepositoryEndpoint {
 
-    private final RepositoryService repositoryService;
+    private final RepositoryService cachedUserRepositoryService;
 
-    RepositoryEndpoint(RepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+    RepositoryEndpoint(RepositoryService cachedUserRepositoryService) {
+        this.cachedUserRepositoryService = cachedUserRepositoryService;
     }
 
     @GetMapping
     @RequestMapping("/{owner}")
     ResponseEntity<UserRepositoryResponse> userRepository(@PathVariable String owner, @RequestParam String name) {
-        var fetchedRepository = repositoryService.userRepository(owner, name);
+        var fetchedRepository = cachedUserRepositoryService.userRepository(owner, name);
 
         var userRepository = new UserRepositoryResponse(
                 fetchedRepository.getName(),
