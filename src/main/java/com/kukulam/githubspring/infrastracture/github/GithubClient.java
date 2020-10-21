@@ -2,6 +2,7 @@ package com.kukulam.githubspring.infrastracture.github;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -13,16 +14,17 @@ import java.util.Optional;
 public class GithubClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GithubClient.class);
-    private static final String GITHUB_URL = "https://api.github.com";
 
     private final RestTemplate restTemplate;
+    private final GithubSettings githubSettings;
 
-    GithubClient(RestTemplate restTemplate) {
+    public GithubClient(RestTemplate restTemplate, GithubSettings githubSettings) {
         this.restTemplate = restTemplate;
+        this.githubSettings = githubSettings;
     }
 
-    public GithubRepository fetchRepositoryInfo(String owner, String name) {
-        String uri = UriComponentsBuilder.fromHttpUrl(GITHUB_URL)
+    public Optional<GithubRepository> fetchRepositoryInfo(String owner, String name) {
+        String uri = UriComponentsBuilder.fromHttpUrl(githubSettings.getUrl())
                 .path("/repos")
                 .pathSegment(owner)
                 .pathSegment(name)
@@ -32,10 +34,9 @@ public class GithubClient {
 
         try {
             var response = restTemplate.getForEntity(uri, GithubRepository.class);
-            return Optional.ofNullable(response.getBody())
-                    .orElseThrow(() -> new RuntimeException("No body"));
+            return Optional.ofNullable(response.getBody());
         } catch (HttpClientErrorException.NotFound e) {
-            throw new NotFoundUserRepositoryException();
+            return Optional.empty();
         }
     }
 }

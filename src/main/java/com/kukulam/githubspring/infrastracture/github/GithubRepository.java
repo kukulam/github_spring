@@ -2,6 +2,8 @@ package com.kukulam.githubspring.infrastracture.github;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class GithubRepository {
     private String name;
     private GithubRepositoryOwner owner;
@@ -59,5 +61,22 @@ public class GithubRepository {
 
     public void setForks(int forks) {
         this.forks = forks;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GithubRepository that = (GithubRepository) o;
+        return stars == that.stars &&
+                forks == that.forks &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(owner, that.owner) &&
+                Objects.equals(language, that.language);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, owner, language, stars, forks);
     }
 }

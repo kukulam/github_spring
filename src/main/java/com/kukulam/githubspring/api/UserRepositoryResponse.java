@@ -1,5 +1,7 @@
 package com.kukulam.githubspring.api;
 
+import java.util.Objects;
+
 class UserRepositoryResponse {
     private String name;
     private String owner;
@@ -56,5 +58,22 @@ class UserRepositoryResponse {
 
     public void setStars(int stars) {
         this.stars = stars;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserRepositoryResponse that = (UserRepositoryResponse) o;
+        return forks == that.forks &&
+                stars == that.stars &&
+                name.equals(that.name) &&
+                owner.equals(that.owner) &&
+                language.equals(that.language);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, owner, language, forks, stars);
     }
 }

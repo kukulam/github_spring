@@ -1,2 +1,2 @@
-server:
-  port: 8002
+github:
+  url: https://api.github.com/aa

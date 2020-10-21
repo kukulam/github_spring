@@ -11,10 +11,10 @@ import java.util.concurrent.Executors;
 @Component
 class CachedUserRepositoryService implements RepositoryService {
 
-    private final UserRepositoryService userRepositoryService;
+    private final RepositoryService userRepositoryService;
     private final LoadingCache<RepositoryCacheKey, Repository> cache;
 
-    public CachedUserRepositoryService(UserRepositoryService userRepositoryService) {
+    public CachedUserRepositoryService(RepositoryService userRepositoryService) {
         this.userRepositoryService = userRepositoryService;
 
         cache = Caffeine.newBuilder()

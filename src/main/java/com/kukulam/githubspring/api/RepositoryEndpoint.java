@@ -24,7 +24,7 @@ public class RepositoryEndpoint {
     }
 
     @GetMapping
-    @RequestMapping("/repositories/{owner}")
+    @RequestMapping("/repository/{owner}")
     ResponseEntity<UserRepositoryResponse> userRepository(@PathVariable String owner, @RequestParam String name) {
         var fetchedRepository = cachedUserRepositoryService.userRepository(owner, name);
 
@@ -40,7 +40,7 @@ public class RepositoryEndpoint {
     }
 
     @GetMapping
-    @RequestMapping("/repository/{owner}")
+    @RequestMapping("/repositories/{owner}")
     ResponseEntity<List<UserRepositoryResponse>> userRepositories(@PathVariable String owner, @RequestParam List<String> names) {
         var userRepositories = multiUserRepositoriesService.userRepository(owner, names).stream()
                 .map(fetchedRepository -> new UserRepositoryResponse(

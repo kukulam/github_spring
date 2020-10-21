@@ -1,0 +1,5 @@
+server:
+  port: 8002
+
+github:
+  url: http://localhost:8099
