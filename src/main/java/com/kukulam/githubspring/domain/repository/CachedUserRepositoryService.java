@@ -20,7 +20,7 @@ class CachedUserRepositoryService implements RepositoryService {
         cache = Caffeine.newBuilder()
                 .maximumSize(1_000)
                 .executor(Executors.newFixedThreadPool(2))
-                .expireAfterWrite(Duration.ofSeconds(30))
+                .expireAfterWrite(Duration.ofSeconds(5))
                 .build(key -> this.userRepositoryService.userRepository(key.owner, key.name));
     }
 
