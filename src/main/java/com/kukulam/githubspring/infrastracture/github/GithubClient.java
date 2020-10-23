@@ -1,5 +1,7 @@
 package com.kukulam.githubspring.infrastracture.github;
 
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,6 +10,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Component
@@ -17,6 +20,13 @@ public class GithubClient {
 
     private final RestTemplate restTemplate;
     private final GithubSettings githubSettings;
+
+    private final RetryConfig retryConfig = RetryConfig.custom()
+            .maxAttempts(3)
+            .waitDuration(Duration.ofSeconds(1))
+            .ignoreExceptions(HttpClientErrorException.class)
+            .build();
+    private final Retry retry = Retry.of("github", retryConfig);
 
     public GithubClient(RestTemplate restTemplate, GithubSettings githubSettings) {
         this.restTemplate = restTemplate;
@@ -30,13 +40,17 @@ public class GithubClient {
                 .pathSegment(name)
                 .toUriString();
 
-        logger.info("Url to github: " + uri);
-
         try {
-            var response = restTemplate.getForEntity(uri, GithubRepository.class);
+            var response = retry.executeCallable(() -> {
+                logger.info("Url to github: " + uri);
+                return restTemplate.getForEntity(uri, GithubRepository.class);
+            });
             return Optional.ofNullable(response.getBody());
         } catch (HttpClientErrorException.NotFound e) {
             return Optional.empty();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
